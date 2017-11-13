@@ -21,7 +21,7 @@ export default class Command {
             sign.getOroscopo()
             .then(function(info){
                 console.log('Sending audio file..')
-                var objReturn = bot.sendAudio(
+                bot.sendAudio(
                     message.chat_id,
                     info.filepath, {
                         file_id: sign.getName()+info.date.date+info.date.month+info.date.year,
@@ -29,8 +29,6 @@ export default class Command {
                         performer: messages.performer,
                         title: messages.title(sign.getName())
                 })
-
-                console.log('File audio sent: ', objReturn)
             })
             .catch(function(reason){
                 console.error('sendAudio failed:' + reason);

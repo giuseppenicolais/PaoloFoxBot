@@ -5,8 +5,13 @@ export default class InputParser{
 		return text.match(command);
 	}
 
-	isCommandOroscopo(text){
+	isCommandHoroscope(text){
 		const command = '/oroscopo';
+		return text.match(command);
+	}
+
+	isCommandDailyHoroscope(text){
+		const command = '/oroscopo_giornaliero';
 		return text.match(command);
 	}
 

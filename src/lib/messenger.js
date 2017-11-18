@@ -1,8 +1,7 @@
 import TelegramBot from 'node-telegram-bot-api';
-import Message from './message';
-import config from '../config';
 import InputParser from './inputParser';
-import Command from '../handlers/command';
+import {Command,answerCallbacks} from '../handlers/command';
+import config from '../config';
 
 const inputParser = new InputParser();
 const command = new Command();
@@ -25,26 +24,44 @@ export default class Messenger {
 
     listen() {
         this.bot.on('text', this.handleText.bind(this));
+
         return Promise.resolve();
     }
 
+    handleMessage(msg){
+        
+    }
+
     handleText(msg) {
-        const message = new Message(Message.mapMessage(msg));
-        const text = message.text;
+        const text = msg.text;
+
+        //reply to the user's choice
+        if (answerCallbacks[msg.chat.id]) {
+            var callback = answerCallbacks[msg.chat.id]
+            if (callback) {
+                delete answerCallbacks[msg.chat.id];
+                callback(msg);
+            }
+        }
 
         //is the command /oroscopo
-        if (inputParser.isCommandOroscopo(text)) {
-      		return command.sendOroscopo(message, this.bot);
+        if (inputParser.isCommandHoroscope(text)) {
+      		return command.sendHoroscopeKeyboard(msg, this.bot);
     	}
+
+        //is the command /oroscopo_giornaliero
+        if (inputParser.isCommandDailyHoroscope(text)) {
+            return command.addDailyHoroscope(msg, this.bot);
+        }
 
         //is the command /start
         if (inputParser.isCommandStart(text)) {
-      		return command.getStart(message, this.bot);
+            return command.getStart(msg, this.bot);
     	}
 
         //is the command /help
         if (inputParser.isCommandHelp(text)) {
-            return command.getHelp(message, this.bot);
+            return command.getHelp(msg, this.bot);
         }
 
    	    return ;

@@ -1,54 +1,71 @@
 import Utils from '../services/utils'
 import Sign from '../services/sign'
-import Constants from '../lib/constants'
 
-const messages = Constants.messages;
+const messages = Utils.messages;
+export var answerCallbacks = {};
 
-export default class Command {
+export class Command {
 
     constructor() {}
 
-    sendOroscopo(message, bot) {
+    sendHoroscopeKeyboard(msg, bot) {
 
-        const sign_name = message.text.split(' ')[1];
-        
-        if (sign_name && !Utils.isZodiacSign(sign_name)) {
-            bot.sendMessage(message.chat_id, message.text + messages.notZodiacSign)
-        } else if (!sign_name) {
-            bot.getHelp(message, bot)
-        } else {
-            const sign = new Sign(sign_name);
-            sign.getOroscopo()
-            .then(function(info){
-                console.log('Sending audio file..')
-                bot.sendAudio(
-                    message.chat_id,
-                    info.filepath, {
-                        file_id: sign.getName()+info.date.date+info.date.month+info.date.year,
-                        caption: messages.getCaption(info),
-                        performer: messages.performer,
-                        title: messages.title(sign.getName())
-                })
-            })
-            .catch(function(reason){
-                console.error('sendAudio failed:' + reason);
+        let zodiacKB = Sign.getSignListKeyboardMarkup();
+        let options = {
+            "reply_markup": {
+                "keyboard": zodiacKB,
+                "force_reply": true,
+                "resize_keyboard" : true
+          }
+        };
+        var chatId = msg.chat.id;
+        bot.sendMessage(chatId, "Seleziona un segno zodiacale", options)
+            .then( (msg) => {
+                    answerCallbacks[chatId] = function(msg){
+                    // console.log(JSON.stringify(msg))
+                    const sign_name = msg.text;
+                    Sign.getHoroscope(sign_name)
+                        .then(function(info) {
+                            // console.log('Sending audio file..')
+                            bot.sendAudio(
+                                    chatId,
+                                    info.filepath, {
+                                        file_id: info.sign_name + info.date.date + info.date.month + info.date.year,
+                                        // caption: messages.caption(info),
+                                        performer: messages.performer,
+                                        title: messages.title(info.sign_name)
+                                    })
+                                .then(function() {
+                                    // console.log('removing keyboard')
+                                    bot.sendMessage(chatId,messages.caption(info),{"reply_markup": {"remove_keyboard" : true}});
+                                })
+                        })
+                        .catch(function(reason) {
+                            console.error('sendAudio failed:' + reason);
+                        });
+                }
             });
-        }
     }
 
-    getStart(message, bot) {
-        if (!Utils.isUserEnabled(message.username)) {
-            bot.sendMessage(message.chat_id, messages.userNotEnabled);
+    /*
+    from: msg.from.id,
+    text: msg.text,
+    chat_id: msg.chat.id,
+    user: {
+        username: msg.from.username,
+        firstName: msg.from.first_name,
+        lastName: msg.from.last_name
+        }
+    */
+    getStart(msg, bot) {
+        if (!Utils.isUserEnabled(msg.from.username)) {
+            bot.sendMessage(msg.chat.id, messages.userNotEnabled);
         } else {
-            bot.sendMessage(message.chat_id, messages.welcome(message.user.firstName));
+            bot.sendMessage(msg.chat.id, messages.welcome(msg.from.first_name));
         }
     }
 
-    getHelp(message, bot) {
-        bot.sendMessage(message.chat_id, messages.oroscopoInstruction);
-    }
-
-    sendMessage(message, bot) {
-        bot.sendMessage(message.chat_id, message);
+    getHelp(msg, bot) {
+        bot.sendMessage(msg.chat.id, messages.horoscopeInstruction);
     }
 }

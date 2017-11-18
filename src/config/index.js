@@ -1,3 +1,5 @@
+require('dotenv').load();
+
 export default {
   telegram: {
     token: process.env.TELEGRAM_TOKEN || 'TELEGRAM_TOKEN',

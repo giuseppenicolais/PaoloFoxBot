@@ -1,41 +1,44 @@
 import Utils from '../services/utils'
-import Constants from '../lib/constants'
-import Command from '../handlers/command'
 
 const path = require('path')
 const fs = require('fs')
 const request = require('request')
+const messages = Utils.messages;
 
-const messages = Constants.messages;
+module.exports = {
 
-export default class Sign {
+    getSignListKeyboardMarkup: function() {
 
-    constructor(name) {
-        this._name = name
-    }
+        return [
+            [
+                { text: 'Ariete', callback_data: 'Ariete' },
+                { text: 'Toro', callback_data: 'Toro' },
+                { text: 'Gemelli', callback_data: 'Gemelli' },
+                { text: 'Cancro', callback_data: 'Cancro' },
+            ],
+            [
+                { text: 'Leone', callback_data: 'Leone' },
+                { text: 'Vergine', callback_data: 'Vergine' },
+                { text: 'Bilancia', callback_data: 'Bilancia' },
+                { text: 'Scorpione', callback_data: 'Scorpione' },
+            ],
+            [
+                { text: 'Sagittario', callback_data: 'Sagittario' },
+                { text: 'Capricorno', callback_data: 'Capricorno' },
+                { text: 'Acquario', callback_data: 'Acquario' },
+                { text: 'Pesci', callback_data: 'Pesci' },
+            ]
+        ]
+    },
 
-    getName() {
-        return this._name;
-    }
+    getHoroscope: function(signName) {
 
-    getInfo() {
-     var sign_name = this._name;
-     
-     //console.log(path.join('/tmp', sign_name + '.mp3'));
-
-     var signInfo = {
-                date: Utils.getDate(),
-                sign_name: sign_name,
-                filepath: path.join('/tmp', sign_name + '.mp3'),
-                url: messages.url(sign_name)
-            }
-
-        return signInfo;
-    }
-
-    getOroscopo() {
-        
-        var info = this.getInfo();
+        var info = {
+            date: Utils.getDate(),
+            sign_name: signName,
+            filepath: path.join('/tmp', signName.toLowerCase() + '.mp3'),
+            url: Utils.getOroscopoUrl(signName.toLowerCase())
+        };
 
         return new Promise(
             function(resolve, reject) {
@@ -45,7 +48,6 @@ export default class Sign {
                 }
 
                 var audioStream = fs.createWriteStream(info.filepath)
-
                 audioStream.on('finish', function() {
                     console.log('uploading ' + info.filepath + ' to telegram server');
                     resolve(info);
@@ -59,11 +61,11 @@ export default class Sign {
                         console.error('Error while downloading the file', err)
                         reject(messages.genericErrorMessage);
                     })
-                    .on('response', function(response) {
-                        console.log('response status code: ' + response.statusCode);
-                    })
                     .pipe(audioStream);
             });
-    }
+    },
 
+    isZodiacSign: function(signName) {
+        return signName && Utils.getZodiacSigns().includes(signName.toLowerCase());
+    }
 }

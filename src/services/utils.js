@@ -16,7 +16,9 @@ module.exports =  {
         const date_info = {
             day: date.getDate(),
             month: date.getMonth(),
-            year: date.getFullYear()
+            year: date.getFullYear(),
+            hours: date.getHours(),
+            minutes: date.getMinutes()
         }
         return date_info;
     },
@@ -40,8 +42,13 @@ module.exports =  {
         },
         genericErrorMessage: 'Errore: riprova più tardi',
         caption: function(info){
-            var sign_name = info.sign_name.toUpperCase();
-            return `Oroscopo ${sign_name} del ${info.date.day}/${info.date.month+1}/${info.date.year}`
+            var sign_name = info.sign_name.toUpperCase(),
+            day = info.date.day;
+
+            if(info.date.hours < 7 && info.date.minutes < 10){
+                day = info.date.day-1;
+            }
+            return `Oroscopo ${sign_name} del ${day}/${info.date.month+1}/${info.date.year}`
         },
         performer : 'Paolo Fox',
         title: function(name){

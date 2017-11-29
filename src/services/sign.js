@@ -1,9 +1,10 @@
 import Utils from '../services/utils'
 
-const path = require('path')
-const fs = require('fs')
-const request = require('request')
-const messages = Utils.messages;
+const   path = require('path'),
+        fs = require('fs'),
+        request = require('request'),
+        fileinfo = require('../model/fileinfo')
+        messages = Utils.messages;
 
 module.exports = {
 
@@ -31,38 +32,50 @@ module.exports = {
         ]
     },
 
-    getHoroscope: function(signName) {
+    downloadAudioFile: function(audioFileInfo, resolve, reject){
+        var options = {
+            headers: { 'user-agent': 'node.js' }
+        }
+        var audioStream = fs.createWriteStream(audioFileInfo.filepath)
+        request.get(audioFileInfo.url, options)
+                .on('error', function(err) {
+                    console.error('Error while downloading the file: ' + err)
+                    reject(err)
+                })
+                .pipe(audioStream)
+                .on('finish', function() {
+                    console.log('uploading ' + audioFileInfo.filepath + ' to telegram server');
+                    resolve(audioFileInfo);
+                })
+    },
 
-        var info = {
+    retrieveHoroscope: function(signName) {
+
+        var audioFileInfo = {
             date: Utils.getDate(),
             sign_name: signName,
-            filepath: path.join('/tmp', signName.toLowerCase() + '.mp3'),
-            url: Utils.getOroscopoUrl(signName.toLowerCase())
+            filepath: path.join('/tmp', signName + '.mp3'),
+            url: Utils.getOroscopoUrl(signName),
+            telegram_file_id: Utils.getTelegramFileId(signName)
         };
 
-        return new Promise(
-            function(resolve, reject) {
-
-                var options = {
-                    headers: { 'user-agent': 'node.js' }
-                }
-
-                var audioStream = fs.createWriteStream(info.filepath)
-                audioStream.on('finish', function() {
-                    console.log('uploading ' + info.filepath + ' to telegram server');
-                    resolve(info);
+        return new Promise{
+            function(resolve, reject){
+                //check the file is already on the Telegram servers by checking if it has been previously inserted in the db FileInfo collection
+                fileinfo.findById(audioFileInfo.telegram_file_id,function(doc){
+                    //TODO
+                    if(doc){
+                        resolve(doc);
+                    }else{
+                       return downloadAudioFile(audioFileInfo, resolve, reject)
+                    }
+                    
+                },function(err){
+                    //TODO
+                    reject(err);
                 })
-
-                debugger;
-
-                request
-                    .get(info.url, options)
-                    .on('error', function(err) {
-                        console.error('Error while downloading the file', err)
-                        reject(messages.genericErrorMessage);
-                    })
-                    .pipe(audioStream);
-            });
+            }
+        }
     },
 
     isZodiacSign: function(signName) {

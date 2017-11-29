@@ -1,13 +1,23 @@
+
+var config = require('../config/index');
+
 module.exports =  {
 
+
     isUserEnabled: function (username) {
-        switch (username) {
-            case 'hardcorewithin':
-            case 'ulapoppy':
-            case 'carlo_colombo':
-                return true;
-            default:
-                return false;
+        if(config.filtering.enabled){
+            console.log('user filtering enabled')
+            switch (username) {
+                case 'hardcorewithin':
+                case 'ulapoppy':
+                case 'carlo_colombo':
+                    return true;
+                default:
+                    return false;
+            }
+        }else {
+            console.log('user filtering disabled')
+            return true;
         }
     },
 
@@ -33,6 +43,12 @@ module.exports =  {
             return (`http://lattemiele.com/wp-content/uploads/${date.year}/${date.month}/${sign_name}.mp3`)
     },
 
+    getTelegramFileId: function(sign_name){
+        var date = this.getDate(),
+            month = date.month+1
+        return 'paolofoxbot' + info.sign_name + date.day + month + date.year;
+    },
+
     messages: {
         horoscopeInstruction: 'Usa il comando /oroscopo e seleziona un segno zodiacale',
         notZodiacSign: ' non è un segno zodiacale',
@@ -41,14 +57,14 @@ module.exports =  {
             return `Benvenuto ${username}! `+ this.horoscopeInstruction
         },
         genericErrorMessage: 'Errore: riprova più tardi',
-        caption: function(info){
-            var sign_name = info.sign_name.toUpperCase(),
-            day = info.date.day;
+        caption: function(audioFileInfo){
+            var sign_name = audioFileInfo.sign_name.toUpperCase(),
+            day = audioFileInfo.date.day;
 
-            if(info.date.hours < 7 && info.date.minutes < 10){
-                day = info.date.day-1;
+            if(audioFileInfo.date.hours < 7 && audioFileInfo.date.minutes < 10){
+                day = audioFileInfo.date.day-1;
             }
-            return `Oroscopo ${sign_name} del ${day}/${info.date.month+1}/${info.date.year}`
+            return `Oroscopo ${sign_name} del ${day}/${audioFileInfo.date.month+1}/${audioFileInfo.date.year}`
         },
         performer : 'Paolo Fox',
         title: function(name){

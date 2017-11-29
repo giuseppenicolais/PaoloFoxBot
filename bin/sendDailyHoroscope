@@ -1,0 +1,31 @@
+#!/usr/bin/env node
+var mongoose = require('mongoose'),
+ users = require('../model/users'),
+ fileinfo = require('../model/fileinfo'),
+ Utils = require('../src/services/utils'),
+ request = require('request'),
+ config = require('../src/config/index');
+
+var date = new Date();
+var trigger_start = date.getHours()+':00';
+users.findAllByTime(trigger_start, function(results){
+	if(results && results.length){
+		results.forEach((user) => {
+			var chat_id = user.chat_id,
+				sign_name = user.subscription.sign_name;
+				
+		    request.post({
+		            url: `https://api.telegram.org/bot${config.telegram.token}/sendMessage`,
+		            form: {
+		            	data: { chat_id: chat_id, text: sign_name}
+		        	}
+		        },
+		        function (err, httpResponse, body) {
+		            console.log(err, body);
+		        });
+		})
+	}
+},
+function(err){
+
+})

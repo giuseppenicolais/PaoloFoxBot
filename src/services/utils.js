@@ -1,11 +1,10 @@
-
-var config = require('../config/index');
+var config = require('../config/index.js');
 
 module.exports =  {
 
 
     isUserEnabled: function (username) {
-        if(config.filtering.enabled){
+        if(config.beta){
             console.log('user filtering enabled')
             switch (username) {
                 case 'hardcorewithin':
@@ -38,15 +37,14 @@ module.exports =  {
         return  ['leone', 'bilancia', 'ariete', 'cancro', 'sagittario', 'gemelli', 'scorpione', 'pesci', 'vergine', 'acquario', 'toro', 'capricorno']
     },
 
-    getOroscopoUrl: function(sign_name){ 
+    getHoroscopeUrl: function(sign_name){ 
             var date = this.getDate();
-            return (`http://lattemiele.com/wp-content/uploads/${date.year}/${date.month}/${sign_name}.mp3`)
+            return (`http://lattemiele.com/wp-content/uploads/${date.year}/${date.month}/${sign_name.toLowerCase()}.mp3`)
     },
 
     getTelegramFileId: function(sign_name){
-        var date = this.getDate(),
-            month = date.month+1
-        return 'paolofoxbot' + info.sign_name + date.day + month + date.year;
+        var date = this.getDate();
+        return  '' + sign_name + date.day + (date.month+1) + date.year
     },
 
     messages: {

@@ -13,7 +13,7 @@ describe('messages', function() {
 })
 
 describe('Utils', function() {
-    describe('#getOroscopoUrl()', function() {
+    describe('#getHoroscopeUrl()', function() {
         it('should return a welcome message with the replaced <current year> , <current month> and sign \'cancro\'', function() {
 
             var date = new Date();
@@ -25,7 +25,7 @@ describe('Utils', function() {
                 sign: 'cancro'
             }
             assert.equal(`http://lattemiele.com/wp-content/uploads/${info.date.year}/${info.date.month}/${info.sign}.mp3`, 
-                Utils.getOroscopoUrl(info.sign))
+                Utils.getHoroscopeUrl(info.sign))
         })
     })
 })

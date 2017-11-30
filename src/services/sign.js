@@ -1,14 +1,13 @@
-import Utils from '../services/utils'
-
-const   path = require('path'),
+var Sign = function(){
+    
+    const path = require('path'),
         fs = require('fs'),
         request = require('request'),
-        fileinfo = require('../model/fileinfo')
+        fileinfo = require('../../model/fileinfo'),
+        Utils = require('../services/utils.js'),
         messages = Utils.messages;
 
-module.exports = {
-
-    getSignListKeyboardMarkup: function() {
+    var _getSignListKeyboardMarkup = function() {
 
         return [
             [
@@ -32,53 +31,93 @@ module.exports = {
         ]
     },
 
-    downloadAudioFile: function(audioFileInfo, resolve, reject){
-        var options = {
-            headers: { 'user-agent': 'node.js' }
-        }
-        var audioStream = fs.createWriteStream(audioFileInfo.filepath)
-        request.get(audioFileInfo.url, options)
-                .on('error', function(err) {
-                    console.error('Error while downloading the file: ' + err)
-                    reject(err)
-                })
-                .pipe(audioStream)
-                .on('finish', function() {
-                    console.log('uploading ' + audioFileInfo.filepath + ' to telegram server');
-                    resolve(audioFileInfo);
-                })
-    },
+    downloadAudio = function(msg, audioFileInfo, resolve, reject) {
+        try{
+            let url = Utils.getHoroscopeUrl(audioFileInfo.sign_name),
+            statusCode,
+            audioStream;
 
-    retrieveHoroscope: function(signName) {
+        audioFileInfo.filepath = path.join('/tmp', audioFileInfo.sign_name.toLowerCase() + '.mp3');
+        audioStream = fs.createWriteStream(audioFileInfo.filepath);
 
-        var audioFileInfo = {
-            date: Utils.getDate(),
-            sign_name: signName,
-            filepath: path.join('/tmp', signName + '.mp3'),
-            url: Utils.getOroscopoUrl(signName),
-            telegram_file_id: Utils.getTelegramFileId(signName)
-        };
-
-        return new Promise{
-            function(resolve, reject){
-                //check the file is already on the Telegram servers by checking if it has been previously inserted in the db FileInfo collection
-                fileinfo.findById(audioFileInfo.telegram_file_id,function(doc){
-                    //TODO
-                    if(doc){
-                        resolve(doc);
-                    }else{
-                       return downloadAudioFile(audioFileInfo, resolve, reject)
-                    }
-                    
-                },function(err){
-                    //TODO
-                    reject(err);
-                })
+        audioStream.on('finish', function() {
+            if (statusCode !== 200) {
+                reject('Status code: ' + statusCode + ' - url: ' + url);
+            } else {
+                console.log('uploading ' + audioFileInfo.filepath + ' to telegram server');
+                //return the file audio
+                resolve(audioFileInfo);
             }
+        })
+
+        request
+            .get(url, { headers: { 'user-agent': 'node.js' } })
+            .on('response', function(response) {
+                statusCode = response.statusCode;
+                // console.log(response.headers['content-type']) // 'image/png'
+            })
+            .on('error', function(err) {
+                console.error('Error while downloading the file from url: ' + url + ' - \n' + err)
+                reject(messages.genericErrorMessage);
+            })
+            .pipe(audioStream);
+        }
+        catch(e){
+            reject(e)
         }
     },
 
-    isZodiacSign: function(signName) {
+    _retrieveAudio = function(msg) {
+
+        //check the file has been already updated on telegram
+        return new Promise(
+            function(resolve, reject) {
+
+                try {
+                    var audioFileInfo = {
+                        sign_name: msg.text,
+                        date: Utils.getDate()
+                    };
+                    fileinfo.findBySignName(audioFileInfo.sign_name, function(doc) {
+                            if (doc) {
+                                audioFileInfo.file_id = doc.file_id;
+                                resolve(audioFileInfo);
+                            } else {
+                                //else download the file
+                                return downloadAudio(msg, audioFileInfo, resolve, reject);
+                            }
+                        },
+                        function(err) {
+                            console.error('Error during fileInfo.findBySignName: ' + err)
+                            reject('Error during fileInfo.findBySignName: ' + err)
+                        })
+                } catch(e) {
+                    console.error('Error retrieveAudio : ' + e)
+                    reject(e);
+                }
+
+            }
+        )
+    },
+
+    _insertFileInfo = function(audioFileInfo){
+         fileinfo.upsert(audioFileInfo, (doc) => {
+                console.log('New fileinfo added: ' + JSON.stringify(audioFileInfo))
+            }, (err) => {
+                console.error('Error during inserting a new file Info: ' + err)
+            })
+    },
+
+    _isZodiacSign = function(signName) {
         return signName && Utils.getZodiacSigns().includes(signName.toLowerCase());
     }
-}
+
+    return {
+        getSignListKeyboardMarkup : _getSignListKeyboardMarkup,
+        retrieveAudio : _retrieveAudio,   
+        isZodiacSign : _isZodiacSign,
+        insertFileInfo: _insertFileInfo
+    }
+}()
+
+module.exports = Sign; 

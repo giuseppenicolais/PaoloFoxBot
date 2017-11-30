@@ -1,6 +1,6 @@
 var FileInfo = function() {
 
-    var Utils = require('../src/services/utils'),
+    var Utils = require('../services/utils'),
     	mongoose = require('mongoose'),
     	Schema = require('mongoose').Schema;
 

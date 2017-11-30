@@ -3,7 +3,7 @@ var Sign = function(){
     const path = require('path'),
         fs = require('fs'),
         request = require('request'),
-        fileinfo = require('../../model/fileinfo'),
+        fileinfo = require('../model/fileinfo'),
         Utils = require('../services/utils.js'),
         messages = Utils.messages;
 

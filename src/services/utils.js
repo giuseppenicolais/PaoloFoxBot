@@ -1,4 +1,4 @@
-var config = require('../config/index.js');
+import config from '../config';
 
 module.exports =  {
 

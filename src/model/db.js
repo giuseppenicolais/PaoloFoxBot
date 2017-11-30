@@ -1,4 +1,4 @@
-import config from '../src/config';
+import config from '../config';
 var mongoose = require('mongoose');
 
 if(process.env.NODE_ENV !== 'production'){

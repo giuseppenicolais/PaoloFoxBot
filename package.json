@@ -4,7 +4,6 @@
   "description": "Questo bot invia un file audio con l'oroscopo del giorno di Paolo Fox",
   "main": "dist/index.js",
   "scripts": {
-    "postinstall": "babel src model -d dist",
     "clean": "rm -rf dist && mkdir dist",
     "serve": "node dist/index.js",
     "start": "nodemon --inspect src/index.js --exec babel-node",

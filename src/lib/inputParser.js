@@ -10,6 +10,11 @@ export default class InputParser{
 		return text.match(command);
 	}
 
+	isCommandDailyHoroscope(text){
+		const command = '/oroscopo_giornaliero';
+		return text.match(command);
+	}
+
 	isCommandHelp(text){
 		const command = '/help';
 		return text.match(command);

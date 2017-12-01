@@ -29,10 +29,6 @@ export default class Messenger {
         return Promise.resolve();
     }
 
-    handleMessage(msg){
-        
-    }
-
     handleText(msg) {
         const text = msg.text;
 
@@ -49,11 +45,6 @@ export default class Messenger {
         if (inputParser.isCommandHoroscope(text)) {
       		return command.sendHoroscope(msg, this.bot);
     	}
-
-        //is the command /oroscopo_giornaliero
-        if (inputParser.isCommandDailyHoroscope(text)) {
-            return command.addDailyHoroscope(msg, this.bot);
-        }
 
         //is the command /start
         if (inputParser.isCommandStart(text)) {

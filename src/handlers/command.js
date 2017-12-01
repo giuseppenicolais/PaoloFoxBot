@@ -1,47 +1,54 @@
 import Utils from '../services/utils'
-import Sign from '../services/sign'
 
-const messages = Utils.messages;
+const messages = Utils.messages,
+    Sign = require('../services/sign');
+
 export var answerCallbacks = {};
 
 export class Command {
 
     constructor() {}
 
-    sendHoroscopeKeyboard(msg, bot) {
+    sendHoroscope(msg, bot) {
 
         let zodiacKB = Sign.getSignListKeyboardMarkup();
         let options = {
             "reply_markup": {
                 "keyboard": zodiacKB,
                 "force_reply": true,
-                "resize_keyboard" : true
-          }
+                "resize_keyboard": true
+            }
         };
-        var chatId = msg.chat.id;
-        bot.sendMessage(chatId, "Seleziona un segno zodiacale", options)
-            .then( (msg) => {
-                    answerCallbacks[chatId] = function(msg){
-                    // console.log(JSON.stringify(msg))
-                    const sign_name = msg.text;
-                    Sign.getHoroscope(sign_name)
-                        .then(function(info) {
-                            // console.log('Sending audio file..')
+
+        bot.sendMessage(msg.chat.id, "Seleziona un segno zodiacale", options)
+            .then((msg) => {
+                answerCallbacks[msg.chat.id] = function(msg) {
+                    Sign.retrieveAudio(msg)
+                        .then(function(audioFileInfo) {
                             bot.sendAudio(
-                                    chatId,
-                                    info.filepath, {
-                                        file_id: info.sign_name + info.date.date + info.date.month + info.date.year,
-                                        // caption: messages.caption(info),
+                                    msg.chat.id,
+                                    (audioFileInfo.file_id ? audioFileInfo.file_id : audioFileInfo.filepath), {
+                                        //caption: messages.caption(audioFileInfo),
                                         performer: messages.performer,
                                         title: messages.title(info.sign_name)
                                     })
-                                .then(function() {
-                                    // console.log('removing keyboard')
-                                    bot.sendMessage(chatId,messages.caption(info),{"reply_markup": {"remove_keyboard" : true}});
+                                .then(function(fileSent) {
+                                    try {
+                                        if (!audioFileInfo.file_id && audioFileInfo.file_id !== '') {
+                                            //update the db
+                                            //console.log('Audio file sent by telegram: ' + JSON.stringify(fileSent))
+                                            audioFileInfo.file_id = fileSent.audio.file_id;
+                                            Sign.insertFileInfo(audioFileInfo);
+                                        }
+                                    } catch (e) {
+                                        console.error('Error while inserting file info: ' + e);
+                                    } finally {
+                                        bot.sendMessage(msg.chat.id, messages.caption(audioFileInfo), { "reply_markup": { "remove_keyboard": true } });
+                                    }
                                 })
                         })
                         .catch(function(reason) {
-                            console.error('sendAudio failed:' + reason);
+                            console.error(reason);
                         });
                 }
             });

@@ -1,4 +1,5 @@
 import Messenger from './lib/messenger';
+var db = require('./model/db')
 
 const bot = new Messenger();
 

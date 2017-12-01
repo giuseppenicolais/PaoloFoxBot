@@ -1,36 +1,41 @@
-module.exports =  {
+import config from '../config';
+
+var utils;
+module.exports =  utils = {
 
     isUserEnabled: function (username) {
-        switch (username) {
-            case 'hardcorewithin':
-            case 'ulapoppy':
-            case 'carlo_colombo':
-                return true;
-            default:
-                return false;
+        if(config.beta){
+            console.log('user filtering enabled')
+            switch (username) {
+                case 'hardcorewithin':
+                case 'ulapoppy':
+                case 'carlo_colombo':
+                    return true;
+                default:
+                    return false;
+            }
+        }else {
+            console.log('user filtering disabled')
+            return true;
         }
     },
 
     getDate: () => {
-        const date = new Date();
-        const date_info = {
-            day: date.getDate(),
-            month: date.getMonth(),
-            year: date.getFullYear(),
-            hours: date.getHours(),
-            minutes: date.getMinutes()
-        }
-        return date_info;
+        var offset = 1; //the app is hosted in a server with offset 0
+        return new Date( new Date().getTime() + offset * 3600 * 1000);
     },
 
+    getItalianLocaleDateString: () => {
+        var d =  utils.getDate();
+        return  d.getDate() + "/" + (d.getMonth() + 1) +  "/" +  d.getFullYear();
+    },
 
     getZodiacSigns: function(){
         return  ['leone', 'bilancia', 'ariete', 'cancro', 'sagittario', 'gemelli', 'scorpione', 'pesci', 'vergine', 'acquario', 'toro', 'capricorno']
     },
 
-    getOroscopoUrl: function(sign_name){ 
-            var date = this.getDate();
-            return (`http://lattemiele.com/wp-content/uploads/${date.year}/${date.month}/${sign_name}.mp3`)
+    getHoroscopeUrl: function(sign_name){ 
+            return ( `${process.env.LATTEMIELE_URL}/${new Date().getFullYear()}/${process.env.LATTEMIELE_URL_MONTH}/${sign_name.toLowerCase()}.mp3`)
     },
 
     messages: {
@@ -41,14 +46,9 @@ module.exports =  {
             return `Benvenuto ${username}! `+ this.horoscopeInstruction
         },
         genericErrorMessage: 'Errore: riprova più tardi',
-        caption: function(info){
-            var sign_name = info.sign_name.toUpperCase(),
-            day = info.date.day;
-
-            if(info.date.hours < 7 && info.date.minutes < 10){
-                day = info.date.day-1;
-            }
-            return `Oroscopo ${sign_name} del ${day}/${info.date.month+1}/${info.date.year}`
+        caption: function(audioFileInfo){
+            var sign_name = audioFileInfo.sign_name.toUpperCase();
+            return `Oroscopo ${sign_name} del ${utils.getItalianLocaleDateString()}`
         },
         performer : 'Paolo Fox',
         title: function(name){

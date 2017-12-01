@@ -6,6 +6,7 @@ import config from '../config';
 const inputParser = new InputParser();
 const command = new Command();
 
+
 export default class Messenger {
 
     constructor() {
@@ -46,7 +47,7 @@ export default class Messenger {
 
         //is the command /oroscopo
         if (inputParser.isCommandHoroscope(text)) {
-      		return command.sendHoroscopeKeyboard(msg, this.bot);
+      		return command.sendHoroscope(msg, this.bot);
     	}
 
         //is the command /oroscopo_giornaliero

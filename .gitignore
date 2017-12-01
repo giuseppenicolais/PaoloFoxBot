@@ -8,5 +8,5 @@ npm-debug.log
 /*.env.*
 /.project
 /.settings
-/model
+.tern-project
 notes.txt

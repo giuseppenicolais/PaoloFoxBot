@@ -74,10 +74,11 @@ var Sign = function(){
             function(resolve, reject) {
 
                 try {
+                    
                     var audioFileInfo = {
-                        sign_name: msg.text,
-                        date: Utils.getDate()
+                        sign_name: msg.text
                     };
+
                     fileinfo.findBySignName(audioFileInfo.sign_name, function(doc) {
                             if (doc) {
                                 audioFileInfo.file_id = doc.file_id;

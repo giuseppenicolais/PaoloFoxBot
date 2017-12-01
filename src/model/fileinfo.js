@@ -16,20 +16,18 @@ var FileInfo = function() {
             required: [true, 'file_id required'],
             unique: true
         },
-        insertion_date: String
+        insertion_date: { type: Date, default: Date.now }
     });
     
     var fileInfoModel = mongoose.model('FileInfo', fileInfoSchema,'FileInfo');
-    var date = Utils.getDate();
-    var insertion_date = '' + date.day + (date.month+1) + date.year;
-
+    
     var _upsert = (fileInfo, success, fail) => {
 
-        if (!fileInfo.sign_name) {
+        if (!(fileInfo.sign_name && fileInfo.file_id)) {
             return console.error('fileInfo.sign_name is required');
         }
 
-        var query = {file_id: fileInfo.file_id, sign_name: fileInfo.sign_name, insertion_date: insertion_date};
+        var query = {file_id: fileInfo.file_id, sign_name: fileInfo.sign_name, insertion_date: Utils.getDate()};
 
         fileInfoModel.findOneAndUpdate(query, fileInfo, { upsert: true , new: true}, (err,newDoc) => {
             if(err){
@@ -41,26 +39,29 @@ var FileInfo = function() {
         });
     }
 
-    var _delete = (fileinfo, success, fail) => {
+    var _deleteAllOldRecords = (success, fail) => {
 
-        if (!(fileinfo.sign_name && fileinfo.insertion_date)) {
-            return console.error('fileinfo informations not valid');
-        }
-
-        var query = {sign_name: fileinfo.sign_name ,"insertion_date": fileinfo.insertion_date};
+        var query = {insertion_date: {$lte: Utils.getDate()}};
 
         fileInfoModel.remove(query,(err, removed) => {
             if(err){
-                console.error('error while _delete: ' + err)
+                console.error('error while _deleteOldRecordsBySignName: ' + err)
                 return fail(err);
             }
-            console.log('audio info remove removed: ' + removed);
+            // console.log('audio info remove removed: ' + removed);
             success(removed)
         });
     }
 
     var _findBySignName = function(sign_name, success, fail) {
-        fileInfoModel.findOne({sign_name: sign_name, insertion_date: insertion_date },'file_id', (err, doc) => {
+        
+        var start = new Date();
+        start.setHours(0,0,0,0);
+        
+        var end = new Date();
+        end.setHours(23,59,59,999);
+
+        fileInfoModel.findOne({sign_name: sign_name, insertion_date: {$gte: start, $lt: end} },'file_id', (err, doc) => {
             if (err) {
                 console.error('error while _findBySignName: ' + err);
                 return fail(err)
@@ -70,8 +71,14 @@ var FileInfo = function() {
     }
 
     var _findAllEntriesOfToday = function(success, fail) {
-        console.log('_findAllEntriesOfToday.insertion_date: ' + insertion_date)
-        var query = {insertion_date: insertion_date};
+        
+        var start = new Date();
+        start.setHours(0,0,0,0);
+        
+        var end = new Date();
+        end.setHours(23,59,59,999);
+
+        var query = {insertion_date: {$gte: start, $lt: end}};
         fileInfoModel.find(query, (err, results) => {
             if (err) {
                 console.error('error while _findAllEntriesOfToday: ' + err);
@@ -84,7 +91,7 @@ var FileInfo = function() {
     return {
         findBySignName: _findBySignName,
         findAllEntriesOfToday: _findAllEntriesOfToday,
-        delete: _delete,
+        deleteAllOldRecords: _deleteAllOldRecords,
         upsert: _upsert,
         model: fileInfoModel,
         schema: fileInfoSchema

@@ -1,7 +1,7 @@
 import config from '../config';
 
-module.exports =  {
-
+var utils;
+module.exports =  utils = {
 
     isUserEnabled: function (username) {
         if(config.beta){
@@ -21,30 +21,21 @@ module.exports =  {
     },
 
     getDate: () => {
-        const date = new Date();
-        const date_info = {
-            day: date.getDate(),
-            month: date.getMonth(),
-            year: date.getFullYear(),
-            hours: date.getHours(),
-            minutes: date.getMinutes()
-        }
-        return date_info;
+        var offset = 1; //the app is hosted in a server with offset 0
+        return new Date( new Date().getTime() + offset * 3600 * 1000);
     },
 
+    getItalianLocaleDateString: () => {
+        var d =  utils.getDate();
+        return  d.getDate() + "/" + (d.getMonth() + 1) +  "/" +  d.getFullYear();
+    },
 
     getZodiacSigns: function(){
         return  ['leone', 'bilancia', 'ariete', 'cancro', 'sagittario', 'gemelli', 'scorpione', 'pesci', 'vergine', 'acquario', 'toro', 'capricorno']
     },
 
     getHoroscopeUrl: function(sign_name){ 
-            var date = this.getDate();
-            return (`http://lattemiele.com/wp-content/uploads/${date.year}/${date.month}/${sign_name.toLowerCase()}.mp3`)
-    },
-
-    getTelegramFileId: function(sign_name){
-        var date = this.getDate();
-        return  '' + sign_name + date.day + (date.month+1) + date.year
+            return ( `${process.env.LATTEMIELE_URL}/${new Date().getFullYear()}/${process.env.LATTEMIELE_URL_MONTH}/${sign_name.toLowerCase()}.mp3`)
     },
 
     messages: {
@@ -56,13 +47,8 @@ module.exports =  {
         },
         genericErrorMessage: 'Errore: riprova più tardi',
         caption: function(audioFileInfo){
-            var sign_name = audioFileInfo.sign_name.toUpperCase(),
-            day = audioFileInfo.date.day;
-
-            if(audioFileInfo.date.hours < 7 && audioFileInfo.date.minutes < 10){
-                day = audioFileInfo.date.day-1;
-            }
-            return `Oroscopo ${sign_name} del ${day}/${audioFileInfo.date.month+1}/${audioFileInfo.date.year}`
+            var sign_name = audioFileInfo.sign_name.toUpperCase();
+            return `Oroscopo ${sign_name} del ${utils.getItalianLocaleDateString()}`
         },
         performer : 'Paolo Fox',
         title: function(name){

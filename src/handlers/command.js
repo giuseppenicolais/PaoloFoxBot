@@ -25,7 +25,6 @@ export class Command {
                 answerCallbacks[msg.chat.id] = function(msg) {
                     Sign.retrieveAudio(msg)
                         .then(function(audioFileInfo) {
-                            let date = Utils.getDate();
                             bot.sendAudio(
                                     msg.chat.id,
                                     (audioFileInfo.file_id ? audioFileInfo.file_id : audioFileInfo.filepath), {
@@ -35,7 +34,7 @@ export class Command {
                                     })
                                 .then(function(fileSent) {
                                     try {
-                                        if (!audioFileInfo.file_id) {
+                                        if (!audioFileInfo.file_id && audioFileInfo.file_id !== '') {
                                             //update the db
                                             //console.log('Audio file sent by telegram: ' + JSON.stringify(fileSent))
                                             audioFileInfo.file_id = fileSent.audio.file_id;

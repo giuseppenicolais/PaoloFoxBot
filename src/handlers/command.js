@@ -30,7 +30,7 @@ export class Command {
                                     (audioFileInfo.file_id ? audioFileInfo.file_id : audioFileInfo.filepath), {
                                         //caption: messages.caption(audioFileInfo),
                                         performer: messages.performer,
-                                        title: messages.title(audioFileInfo.sign_name)
+                                        title: messages.title(info.sign_name)
                                     })
                                 .then(function(fileSent) {
                                     try {
@@ -54,6 +54,16 @@ export class Command {
             });
     }
 
+    /*
+    from: msg.from.id,
+    text: msg.text,
+    chat_id: msg.chat.id,
+    user: {
+        username: msg.from.username,
+        firstName: msg.from.first_name,
+        lastName: msg.from.last_name
+        }
+    */
     getStart(msg, bot) {
         if (!Utils.isUserEnabled(msg.from.username)) {
             bot.sendMessage(msg.chat.id, messages.userNotEnabled);

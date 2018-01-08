@@ -35,7 +35,7 @@ module.exports =  utils = {
     },
 
     getHoroscopeUrl: function(sign_name){ 
-            return ( `${process.env.LATTEMIELE_URL}/${new Date().getFullYear()}/${process.env.LATTEMIELE_URL_MONTH}/${sign_name.toLowerCase()}.mp3`)
+            return ( `${process.env.LATTEMIELE_URL}/${process.env.LATTEMIELE_URL_YEAR}/${process.env.LATTEMIELE_URL_MONTH}/${sign_name.toLowerCase()}.mp3`)
     },
 
     messages: {

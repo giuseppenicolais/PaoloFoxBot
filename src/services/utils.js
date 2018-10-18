@@ -34,8 +34,18 @@ module.exports =  utils = {
         return  ['leone', 'bilancia', 'ariete', 'cancro', 'sagittario', 'gemelli', 'scorpione', 'pesci', 'vergine', 'acquario', 'toro', 'capricorno']
     },
 
-    getHoroscopeUrl: function(sign_name){ 
-            return ( `${process.env.LATTEMIELE_URL}/${process.env.LATTEMIELE_URL_YEAR}/${process.env.LATTEMIELE_URL_MONTH}/${sign_name.toLowerCase()}.mp3`)
+    getHoroscopeUrl: function(sign_name){
+        var url = `${process.env.LATTEMIELE_URL}`;
+        var year = `${process.env.LATTEMIELE_URL_YEAR}`;
+        var month = `${process.env.LATTEMIELE_URL_MONTH}`;
+        if(year)
+            url = url+'/'+year;
+        if (month)
+            url = url+'/'+month;
+
+        url = url + '/'+ `${sign_name.toLowerCase()}` + '.mp3';
+
+        return url;
     },
 
     messages: {

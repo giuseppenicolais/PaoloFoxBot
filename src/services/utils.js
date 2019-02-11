@@ -3,23 +3,6 @@ import config from '../config';
 var utils;
 module.exports =  utils = {
 
-    isUserEnabled: function (username) {
-        if(config.beta){
-            console.log('user filtering enabled')
-            switch (username) {
-                case 'hardcorewithin':
-                case 'ulapoppy':
-                case 'carlo_colombo':
-                    return true;
-                default:
-                    return false;
-            }
-        }else {
-            console.log('user filtering disabled')
-            return true;
-        }
-    },
-
     getDate: () => {
         var offset = 1; //the app is hosted in a server with offset 0
         return new Date( new Date().getTime() + offset * 3600 * 1000);
@@ -35,9 +18,9 @@ module.exports =  utils = {
     },
 
     getHoroscopeUrl: function(sign_name){
-        var url = `${process.env.LATTEMIELE_URL}`;
-        var year = `${process.env.LATTEMIELE_URL_YEAR}`;
-        var month = `${process.env.LATTEMIELE_URL_MONTH}`;
+        var url =  config.latte_miele.url;
+        var year = config.latte_miele.year;
+        var month = config.latte_miele.month;
         if(year)
             url = url+'/'+year;
         if (month)

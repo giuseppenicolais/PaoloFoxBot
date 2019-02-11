@@ -1,7 +1,8 @@
 import Utils from '../services/utils'
 
 const messages = Utils.messages,
-    Sign = require('../services/sign');
+    Sign = require('../services/sign'),
+    UserService = require('../services/user');
 
 export var answerCallbacks = {};
 
@@ -23,8 +24,14 @@ export class Command {
         bot.sendMessage(msg.chat.id, "Seleziona un segno zodiacale", options)
             .then((msg) => {
                 answerCallbacks[msg.chat.id] = function(msg) {
+                    var user = msg;
                     Sign.retrieveAudio(msg)
                         .then(function(audioFileInfo) {
+
+                            //insert user info
+                            user['sign'] = audioFileInfo.sign_name;
+                            UserService.insertUser(user);
+
                             bot.sendAudio(
                                     msg.chat.id,
                                     (audioFileInfo.file_id ? audioFileInfo.file_id : audioFileInfo.filepath), {
@@ -35,8 +42,6 @@ export class Command {
                                 .then(function(fileSent) {
                                     try {
                                         if (!audioFileInfo.file_id && audioFileInfo.file_id !== '') {
-                                            //update the db
-                                            //console.log('Audio file sent by telegram: ' + JSON.stringify(fileSent))
                                             audioFileInfo.file_id = fileSent.audio.file_id;
                                             Sign.insertFileInfo(audioFileInfo);
                                         }
@@ -55,11 +60,7 @@ export class Command {
     }
 
     getStart(msg, bot) {
-        if (!Utils.isUserEnabled(msg.from.username)) {
-            bot.sendMessage(msg.chat.id, messages.userNotEnabled);
-        } else {
-            bot.sendMessage(msg.chat.id, messages.welcome(msg.from.first_name));
-        }
+        bot.sendMessage(msg.chat.id, messages.welcome(msg.from.first_name));
     }
 
     getHelp(msg, bot) {

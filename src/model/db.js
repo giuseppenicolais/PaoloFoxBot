@@ -15,8 +15,8 @@ db.on('connected', function(){
 
 db.once('open', function () {
 	//load models
-	//require('./user')
 	require('./fileinfo')
+	require('./user')
 });
 
 db.on('error',function(err){

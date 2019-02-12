@@ -12,8 +12,13 @@ var UserDao = function() {
         },
         username: {
             type: String,
-            required: [true, 'username required'],
             trim: true,
+            unique: true
+        },
+        first_name: {
+            type: String,
+            trim: true,
+			required: [true, 'first_name required'],
             unique: true
         },
         chat_id: {
@@ -43,7 +48,7 @@ var UserDao = function() {
             return console.error('User information not valid');
         }
 
-        var query = {user_id: user.from.id, username: user.from.username, chat_id: user.chat.id, message_id: user.message_id ,is_bot: user.from.is_bot, subscription: {subscription_date: Utils.getDate(), sign: user.sign}};
+        var query = {user_id: user.from.id, username: user.from.username, first_name: user.from.first_name, chat_id: user.chat.id, message_id: user.message_id ,is_bot: user.from.is_bot, subscription: {subscription_date: Utils.getDate(), sign: user.sign}};
 
         userModel.findOneAndUpdate(query, user, { upsert: true , new: true}, (err,newDoc) => {
             if(err){

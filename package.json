@@ -19,7 +19,7 @@
     "babel-preset-stage-2": "^6.5.0",
     "babel-register": "^6.26.0",
     "dotenv": "^4.0.0",
-    "mongoose": "^4.13.12",
+    "mongoose": "^5.7.5",
     "node-telegram-bot-api": "^0.29.0",
     "request": "^2.85.0",
     "sinon": "^4.5.0"

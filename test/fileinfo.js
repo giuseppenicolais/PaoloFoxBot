@@ -8,7 +8,7 @@ var fileinfo,
     should = chai.should;
 chai.use(require('chai-datetime'));
 
-mongoose.connect(process.env.LOCAL_MONGODB_URI, { useMongoClient: true });
+mongoose.connect(process.env.LOCAL_MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
 // mongoose.connection.once('open', function() {
 //load models

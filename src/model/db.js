@@ -5,7 +5,7 @@ if(process.env.NODE_ENV !== 'production'){
 	console.log('db uri: ' + config.db);	
 }
 
-mongoose.connect(config.db, { useMongoClient: true });
+mongoose.connect(config.db, { useNewUrlParser: true, useUnifiedTopology: true });
 mongoose.Promise = global.Promise;
 var db = mongoose.connection;
 

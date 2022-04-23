@@ -35,7 +35,7 @@
     "forever": "^3.0.4",
     "mocha": "^8.3.2",
     "nodemon": "^1.19.4",
-    "set-value": "^3.0.2"
+    "set-value": "^4.0.1"
   },
   "engines": {
     "node": "8.9.0"

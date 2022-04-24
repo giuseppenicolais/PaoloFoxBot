@@ -1,4 +1,4 @@
-require('dotenv').load();
+require('dotenv').config();
 
 var assert = require('chai').assert;
 import Utils from '../src/services/utils.js'
@@ -17,9 +17,7 @@ describe('messages', function() {
 describe('Utils', function() {
     describe('#getHoroscopeUrl()', function() {
         it('should return a welcome message with the replaced <current year> , <current month> and sign \'cancro\'', function() {
-
-            assert.equal(`http://lattemiele.com/wp-content/uploads/${new Date().getFullYear()}/10/cancro.mp3`, 
-                Utils.getHoroscopeUrl('cancro'))
+            assert.equal(Utils.getHoroscopeUrl('cancro'), `http://lattemiele.com/wp-content/oroscopo/cancro.mp3`)
         })
     })
 })

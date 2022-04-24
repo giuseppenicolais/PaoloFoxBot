@@ -43,7 +43,7 @@ var FileInfo = function() {
 
         var query = {insertion_date: {$lte: Utils.getDate()}};
 
-        fileInfoModel.remove(query,(err, removed) => {
+        fileInfoModel.deleteMany(query,(err, removed) => {
             if(err){
                 console.error('error while _deleteOldRecordsBySignName: ' + err)
                 return fail(err);
@@ -61,11 +61,12 @@ var FileInfo = function() {
         var end = new Date();
         end.setHours(23,59,59,999);
 
-        fileInfoModel.findOne({sign_name: sign_name, insertion_date: {$gte: start, $lt: end} },'file_id', (err, doc) => {
+        fileInfoModel.findOne({sign_name: sign_name, insertion_date: {$gte: start, $lt: end} }, (err, doc) => {
             if (err) {
                 console.error('error while _findBySignName: ' + err);
                 return fail(err)
-            } 
+            }
+            // console.log('findBySignName found: ' + doc)
             success(doc)
         });
     }

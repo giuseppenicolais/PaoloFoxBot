@@ -9,33 +9,33 @@
     "start": "nodemon --inspect src/index.js --exec babel-node",
     "build": "npm run clean && npm run build-server",
     "build-server": "babel src -d dist",
-    "test": "mocha --require @babel/register"
+    "test": "mocha --exit --require @babel/register"
   },
   "dependencies": {
-    "@babel/cli": "^7.13.10",
-    "@babel/core": "^7.13.10",
+    "@babel/cli": "^7.17.6",
+    "@babel/core": "^7.17.9",
     "@babel/polyfill": "^7.12.1",
-    "@babel/preset-es2015": "^7.0.0-beta.53",
     "@babel/preset-stage-2": "^7.8.3",
-    "@babel/register": "^7.13.8",
-    "dotenv": "^4.0.0",
-    "mongoose": "^5.12.0",
-    "node": "^15.10.0",
-    "node-telegram-bot-api": "^0.29.0",
+    "@babel/register": "^7.17.7",
+    "dotenv": "^16.0.0",
+    "mongoose": "^6.3.1",
+    "node": "^17.7.2",
+    "node-telegram-bot-api": "^0.56.0",
     "request": "^2.88.2",
-    "sinon": "^4.5.0",
-    "yargs-parser": "^20.2.7"
+    "sinon": "^13.0.2",
+    "yargs-parser": "^21.0.1"
   },
   "devDependencies": {
-    "@babel/preset-env": "^7.13.10",
-    "braces": ">=2.3.1",
-    "chai": "^4.3.4",
+    "async": "^3.2.3",
+    "babel-preset-env": "^1.7.0",
+    "braces": ">=3.0.2",
+    "chai": "^4.3.6",
     "chai-datetime": "^1.8.0",
     "diff": "^5.0.0",
-    "forever": "^3.0.4",
-    "mocha": "^8.3.2",
-    "nodemon": "^1.19.4",
-    "set-value": "^4.0.1"
+    "forever": "^4.0.3",
+    "mocha": "^9.2.2",
+    "nodemon": "^2.0.15",
+    "set-value": "^4.1.0"
   },
   "engines": {
     "node": "8.9.0"

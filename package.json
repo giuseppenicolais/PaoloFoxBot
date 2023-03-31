@@ -26,6 +26,7 @@
     "yargs-parser": "^21.0.1"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.21.4",
     "async": "^3.2.3",
     "babel-preset-env": "^1.7.0",
     "braces": ">=3.0.2",
